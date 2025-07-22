@@ -1,0 +1,25 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.2">
+    <persistence-unit name="yourPersistenceUnit">
+        <!-- сущности -->
+        <class>Nelobbick.models.Book</class>
+        <class>Nelobbick.models.Person</class>
+
+        <properties>
+            <!-- Автоматическая генерация схемы -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+            <!-- Показ SQL в логах -->
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+
+            <!-- Настройки БД (пример для PostgreSQL) -->
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/your_db"/>
+            <property name="javax.persistence.jdbc.user" value="your_user"/>
+            <property name="javax.persistence.jdbc.password" value="your_password"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+
+            <!-- Диалект БД -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+        </properties>
+    </persistence-unit>
+</persistence>

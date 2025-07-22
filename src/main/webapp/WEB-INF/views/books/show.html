@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Book Details</title>
+    <style>
+        .expired {
+            color: red;
+            font-weight: bold;
+        }
+        .status-badge {
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .status-expired {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .status-ok {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+<!-- Добавляем статус книги -->
+<div th:if="${book.isExpired != null}">
+    <p th:text="${book.title + ', ' + book.author + ', ' + book.year}"
+       th:class="${book.isExpired} ? 'expired' : ''">VALUE</p>
+
+    <span th:if="${book.isExpired}" class="status-badge status-expired">ПРОСРОЧЕНО</span>
+    <span th:unless="${book.isExpired}" class="status-badge status-ok">В сроке</span>
+</div>
+
+<div th:if="${owner}">
+    <span>Книга сейчас у: </span>
+    <span th:text="${owner.fullName}">Person Name</span>
+
+    <!-- Добавляем информацию о дате взятия -->
+    <div th:if="${book.getDate_of_collection() != null}">
+        <span>Взята: </span>
+        <span th:text="${#temporals.format(book.getDate_of_collection(), 'dd.MM.yyyy HH:mm')}"></span>
+    </div>
+
+    <form th:method="PATCH" th:action="@{/books/{id}/release(id=${book.id})}">
+        <input type="submit" value="Освободить книгу"/>
+    </form>
+</div>
+
+<div th:if="${people}">
+    <span>Эта книга свободна. Кому назначить ее?</span>
+    <form th:method="PATCH" th:action="@{/books/{id}/assign(id=${book.id})}">
+        <label for="person">Выберите человека</label>
+        <select name="id" id="person">
+            <option th:each="person : ${people}"
+                    th:value="${person.id}"
+                    th:text="${person.fullName}">
+            </option>
+        </select>
+        <input type="submit" value="Назначить книгу"/>
+    </form>
+</div>
+
+<hr/>
+
+<form th:method="GET" th:action="@{/books/{id}/edit(id=${book.id})}">
+    <input type="submit" value="Редактировать"/>
+</form>
+
+<form th:method="DELETE" th:action="@{/books/{id}(id=${book.id})}">
+    <input type="submit" value="Удалить"/>
+</form>
+<a href="/books">Вернуться на страницу с книгами</a>
+
+</body>
+</html>

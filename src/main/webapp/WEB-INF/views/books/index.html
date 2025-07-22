@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Книги</title>
+    <style>
+        .pagination-container {
+            margin: 20px 0;
+        }
+        .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+        }
+        .disabled-link {
+            color: gray;
+            cursor: default;
+            pointer-events: none;
+        }
+        .expired {
+            color: red;
+            font-weight: bold;
+        }
+        .expired-badge {
+            color: white;
+            background-color: red;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Управление сортировкой -->
+<div>
+    <a th:href="@{/books(page=${paginationEnabled ? currentPage : ''},
+                       size=${paginationEnabled ? pageSize : ''},
+                       sort=${!sortingEnabled})}">
+        <span th:if="${sortingEnabled}">Отключить сортировку</span>
+        <span th:unless="${sortingEnabled}">Сортировать по году ↑</span>
+    </a>
+</div>
+
+<!-- Список книг -->
+<div th:each="book : ${books}">
+    <p th:class="${book.isExpired} ? 'expired' : ''">
+        <a th:href="@{/books/{id}(id=${book.id})}"
+           th:text="${book.title + ', ' + book.author + ', ' + book.year}"></a>
+        <span th:if="${book.isExpired}" class="expired-badge">ПРОСРОЧЕНО</span>
+    </p>
+</div>
+
+<!-- Пагинация -->
+<div class="pagination-container">
+    <!-- Кнопка переключения режима -->
+    <div th:if="${paginationEnabled and pageSize > 0}">
+        <a th:href="@{/books(size=0, sort=${sortingEnabled})}">Показать все книги</a>
+    </div>
+    <div th:unless="${paginationEnabled and pageSize > 0}">
+        <a th:href="@{/books(page=0, size=10, sort=${sortingEnabled})}">Включить разделение на страницы</a>
+    </div>
+
+    <!-- Навигация по страницам (только при включенной пагинации) -->
+    <div th:if="${paginationEnabled and pageSize > 0}" style="margin-top: 10px;">
+        <!-- Первая страница - активна только если не на первой странице -->
+        <a th:href="@{/books(page=0, size=${pageSize}, sort=${sortingEnabled})}"
+           th:class="${currentPage <= 0} ? 'disabled-link' : ''"
+           th:if="${currentPage > 0}">
+            Первая
+        </a>
+        <span th:if="${currentPage <= 0}" class="disabled-link">Первая</span>
+
+        <!-- Назад - активна только если не на первой странице -->
+        <a th:href="@{/books(page=${currentPage - 1}, size=${pageSize}, sort=${sortingEnabled})}"
+           th:class="${currentPage <= 0} ? 'disabled-link' : ''"
+           th:if="${currentPage > 0}">
+            ← Назад
+        </a>
+        <span th:if="${currentPage <= 0}" class="disabled-link">← Назад</span>
+
+        <!-- Текущая страница -->
+        <span>Страница <span th:text="${currentPage + 1}"></span> из <span th:text="${totalPages}"></span></span>
+
+        <!-- Вперед - активна только если есть следующая страница -->
+        <a th:href="@{/books(page=${currentPage + 1}, size=${pageSize}, sort=${sortingEnabled})}"
+           th:class="${currentPage + 1 >= totalPages} ? 'disabled-link' : ''"
+           th:if="${currentPage + 1 < totalPages}">
+            Вперед →
+        </a>
+        <span th:if="${currentPage + 1 >= totalPages}" class="disabled-link">Вперед →</span>
+    </div>
+</div>
+
+<hr/>
+<div>
+    <a th:href="@{/books/new}">Добавить книгу</a>
+    <span> | </span>
+    <a th:href="@{/}">Главная страница</a>
+</div>
+
+</body>
+</html>
